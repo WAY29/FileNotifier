@@ -1,6 +1,6 @@
 builds:
     - binary: FileNotifier
-      main: cmd/FileNotifier/
+      main: ./cmd/FileNotifier/
       goos:
         - linux
         - windows
