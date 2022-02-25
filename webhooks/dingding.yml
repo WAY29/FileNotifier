@@ -1,0 +1,9 @@
+name: dingding
+url: https://oapi.dingtalk.com/robot/send?access_token=xxxxxxxxxxxxxxxx
+method: POST
+headers:
+  Content-Type: application/json
+body: |
+  {"msgtype":"markdown","markdown":{"title":"文件监控通知","text":"#### 文件监控通知\n 文件名: {{filename}}\n\n 修改内容: {{text}}"},"at":{"atMobiles":[],"atUserIds":[],"isAtAll":false}}
+urlencode_text: false
+esacpe_json: true

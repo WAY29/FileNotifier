@@ -1,0 +1,9 @@
+name: feishu
+url: https://open.feishu.cn/open-apis/bot/v2/hook/xxxxxxxxxxxxxxxx
+method: POST
+headers:
+  Content-Type: application/json
+body: |
+  {"msg_type":"post","content":{"post":{"zh_cn":{"title":"文件监控通知","content":[[{"tag":"text","text":"文件名: {{filename}}"}],[{"tag":"text","text":"修改内容: {{text}}"}]]}}}}
+urlencode_text: false
+esacpe_json: true
