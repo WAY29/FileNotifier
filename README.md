@@ -12,3 +12,6 @@ vi webhooks/feishu.yml # 修改webhook templates / edit webhook templates
 ```bash
 FileNotifier -t ./webhooks/feishu.yml -f /tmp/something -d /tmp/somedir -e write,rename,remove
 ```
+
+## Proclamations
+工具仅用于安全研究，由于使用该工具造成的任何后果使用者负责
