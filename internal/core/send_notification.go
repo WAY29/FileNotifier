@@ -3,6 +3,7 @@ package core
 import (
 	"encoding/json"
 	"net/url"
+	"os/exec"
 	"strings"
 
 	"github.com/WAY29/FileNotifier/utils"
@@ -15,7 +16,17 @@ var (
 )
 
 func render(raw, filename, text string) string {
-	filename = strings.ReplaceAll(filename, "\\", "/")
+	raw = strings.ReplaceAll(raw, "{{text}}", text)
+	raw = strings.ReplaceAll(raw, "{{filename}}", filename)
+	return raw
+}
+
+func vRender(raw, filename, text string) string {
+	text = strings.ReplaceAll(text, "\n", "\\n")
+	text = strings.ReplaceAll(text, "\r", "\\r")
+	filename = strings.ReplaceAll(filename, "\n", "\\n")
+	filename = strings.ReplaceAll(filename, "\r", "\\r")
+
 	raw = strings.ReplaceAll(raw, "{{text}}", text)
 	raw = strings.ReplaceAll(raw, "{{filename}}", filename)
 	return raw
@@ -23,16 +34,66 @@ func render(raw, filename, text string) string {
 
 func SendNotify(filename, text string) {
 	var (
+		c *exec.Cmd
+
 		targetUrl, body string
 		headers         map[string]string
+		Encodedtext     string
 
-		Encodedtext string
+		output    []byte
+		err, nErr error
 	)
 	if text == "" {
 		return
 	}
 
 	for _, template := range Templates {
+		// 对windows路径进行处理
+		filename = strings.ReplaceAll(filename, "\\", "/")
+
+		for _, command := range template.TextCommandChain {
+			command = vRender(command, filename, text)
+			c, err = utils.ExecCommand(command)
+			if err != nil {
+				nErr = errors.Wrapf(err, "Exec command[%s] error", command)
+				utils.ErrorP(nErr)
+				return
+			}
+			output, err = c.Output()
+			if err != nil {
+				nErr = errors.Wrapf(err, "Get commond[%s] output error", command)
+				utils.ErrorP(nErr)
+				return
+			}
+			text = strings.ReplaceAll(string(output), "\\n", "\n")
+			text = strings.ReplaceAll(text, "\\r", "\r")
+			text = strings.TrimSpace(text)
+			if text == "" {
+				return
+			}
+		}
+		for _, command := range template.FilenameCommandChain {
+			command = vRender(command, filename, text)
+			c, err = utils.ExecCommand(command)
+			if err != nil {
+				nErr = errors.Wrapf(err, "Exec command[%s] error", command)
+				utils.ErrorP(nErr)
+				return
+			}
+			output, err = c.Output()
+			if err != nil {
+				nErr = errors.Wrapf(err, "Get commond[%s] output error", command)
+				utils.ErrorP(nErr)
+				return
+			}
+			filename = strings.ReplaceAll(string(output), "\\n", "\n")
+			filename = strings.ReplaceAll(filename, "\\r", "\r")
+			filename = strings.TrimSpace(filename)
+			if filename == "" {
+				return
+			}
+		}
+
 		if template.UrlEncodeText {
 			Encodedtext = url.QueryEscape(text)
 		} else {
@@ -58,7 +119,8 @@ func SendNotify(filename, text string) {
 		}
 
 		body = render(template.Body, filename, Encodedtext)
-		utils.DebugF("%#v %#v %s", filename, Encodedtext, body)
+
+		utils.DebugF("debug: %s %#v %#v", body, text, filename)
 
 		resp, err := Client.R().SetHeaders(headers).SetBody(body).Execute(template.Method, targetUrl)
 		if err != nil {

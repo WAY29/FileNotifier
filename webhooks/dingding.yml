@@ -5,5 +5,9 @@ headers:
   Content-Type: application/json
 body: |
   {"msgtype":"markdown","markdown":{"title":"文件监控通知","text":"#### 文件监控通知\n 文件名: {{filename}}\n\n 修改内容: {{text}}"},"at":{"atMobiles":[],"atUserIds":[],"isAtAll":false}}
-urlencode_text: false
-esacpe_json: true
+# text_command_chain: # 是一个数组，在urlencode_text与escape_json之前按顺序执行命令，text的值将会被每一条命令的输出覆盖，用于调用外部命令修改/过滤text，text值为空时则停止发送通知。注意这里的{{text}}与{{filename}}会转义\r\n，并且在所有命令执行完之后存在反转义\r\n的行为
+  # - echo {{text}} 
+# filename_command_chain: # filename是文件的绝对路径。与text_commond_chain类似，但是对filename进行处理。
+  # - echo {{filename}} 
+urlencode_text: false # 将text url编码
+escape_json: true # 将text json编码，但除去包裹的双引号
