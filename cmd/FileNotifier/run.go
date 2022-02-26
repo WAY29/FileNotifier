@@ -1,6 +1,10 @@
 package main
 
 import (
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/WAY29/FileNotifier/internal/core"
 	"github.com/WAY29/FileNotifier/utils"
 	cli "github.com/jawher/mow.cli"
@@ -21,7 +25,8 @@ func cmdRun(cmd *cli.Cmd) {
 	cmd.Spec = "(-t=<template>)... (-f=<file> | -d=<directory>)... -e=<event>... [--debug] [-v | --verbose]"
 
 	cmd.Action = func() {
-		done := make(chan bool)
+		c := make(chan os.Signal)
+		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
 		// 初始化日志
 		utils.InitLog(*debug, *verbose)
@@ -37,7 +42,8 @@ func cmdRun(cmd *cli.Cmd) {
 
 		utils.Message("Start FileNotifier...")
 
-		<-done
+		<-c
+		os.Exit(0)
 	}
 
 }
