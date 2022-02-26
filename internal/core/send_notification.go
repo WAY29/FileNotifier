@@ -61,8 +61,12 @@ func SendNotify(filename, text string) {
 			}
 			output, err = c.Output()
 			if err != nil {
-				nErr = errors.Wrapf(err, "Get commond[%s] output error", command)
-				utils.ErrorP(nErr)
+				if exitError, ok := err.(*exec.ExitError); ok {
+					utils.WarningF("Exec command[%s] return status %d, skip send notification", command, exitError.ExitCode())
+				} else {
+					nErr = errors.Wrapf(err, "Get commond[%s] output error", command)
+					utils.ErrorP(nErr)
+				}
 				return
 			}
 			text = strings.ReplaceAll(string(output), "\\n", "\n")
@@ -82,8 +86,12 @@ func SendNotify(filename, text string) {
 			}
 			output, err = c.Output()
 			if err != nil {
-				nErr = errors.Wrapf(err, "Get commond[%s] output error", command)
-				utils.ErrorP(nErr)
+				if exitError, ok := err.(*exec.ExitError); ok {
+					utils.WarningF("Exec command[%s] return status %d, skip send notification", command, exitError.ExitCode())
+				} else {
+					nErr = errors.Wrapf(err, "Get commond[%s] output error", command)
+					utils.ErrorP(nErr)
+				}
 				return
 			}
 			filename = strings.ReplaceAll(string(output), "\\n", "\n")
