@@ -90,6 +90,7 @@ func addWatch(path string, excludes []string) {
 		utils.ErrorP(nErr)
 	} else {
 		utils.InfoF("Watch file/direcotry: %#v", absPath)
+		addOrUpdateContentMap(absPath)
 		WatchNumber += 1
 	}
 
@@ -104,7 +105,6 @@ func addWatch(path string, excludes []string) {
 
 		for _, fi := range dir {
 			addWatch(absPath+PthSep+fi.Name(), excludes)
-			addOrUpdateContentMap(absPath + PthSep + fi.Name())
 		}
 	}
 }
