@@ -18,6 +18,7 @@ var (
 func render(raw, filename, text string) string {
 	raw = strings.ReplaceAll(raw, "{{text}}", text)
 	raw = strings.ReplaceAll(raw, "{{filename}}", filename)
+
 	return raw
 }
 
@@ -29,6 +30,7 @@ func vRender(raw, filename, text string) string {
 
 	raw = strings.ReplaceAll(raw, "{{text}}", text)
 	raw = strings.ReplaceAll(raw, "{{filename}}", filename)
+
 	return raw
 }
 
@@ -116,7 +118,8 @@ func SendNotify(filename, text string) {
 			Encodedtext = strings.ReplaceAll(text, "\\", "\\\\")
 		}
 
-		targetUrl = render(template.Url, filename, url.PathEscape(text))
+		targetUrl = render(template.Url, url.PathEscape(filename), url.PathEscape(text))
+
 		headers = make(map[string]string, len(template.Headers))
 		for key, value := range template.Headers {
 			headers[key] = value
@@ -127,8 +130,6 @@ func SendNotify(filename, text string) {
 		}
 
 		body = render(template.Body, filename, Encodedtext)
-
-		utils.DebugF("debug: %s %#v %#v", body, text, filename)
 
 		resp, err := Client.R().SetHeaders(headers).SetBody(body).Execute(template.Method, targetUrl)
 		if err != nil {
@@ -142,7 +143,7 @@ func SendNotify(filename, text string) {
 		} else {
 			utils.SuccessF("Template[%s] send notification %#v success", template.Name, text)
 		}
- 
+
 		utils.DebugF("StatusCode:%d Response: %s", resp.StatusCode(), resp.String())
 	}
 }
