@@ -2,7 +2,7 @@
   extraCommands = ["git push", "git push --tags"]
   serialize = "{version}-{banner}"
   tag = true
-  version = "1.3.0"
+  version = "1.4.0"
 
 [[operate]]
   location = "cmd/FileNotifier/main.go"
