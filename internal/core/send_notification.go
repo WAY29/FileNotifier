@@ -132,15 +132,17 @@ func SendNotify(filename, text string) {
 
 		resp, err := Client.R().SetHeaders(headers).SetBody(body).Execute(template.Method, targetUrl)
 		if err != nil {
-			nErr := errors.Wrapf(err, "Template[%s] send text '%s' error", template.Name, text)
+			nErr := errors.Wrapf(err, "Template[%s] send text %#v error", template.Name, text)
 			utils.ErrorP(nErr)
 			return
 		}
 
 		if resp.StatusCode() != 200 {
 			utils.WarningF("Template[%s] StatusCode != 200", template.Name)
+		} else {
+			utils.SuccessF("Template[%s] send notification %#v success", template.Name, text)
 		}
-
+ 
 		utils.DebugF("StatusCode:%d Response: %s", resp.StatusCode(), resp.String())
 	}
 }

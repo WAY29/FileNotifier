@@ -20,13 +20,6 @@ func MessageF(message string, args ...interface{}) {
 	fmt.Println(Gray(8, "[#]"), fmt.Sprintf(message, args...))
 }
 
-func Question(message string) {
-	fmt.Print(Yellow("[?]"), message)
-}
-func QuestionF(message string, args ...interface{}) {
-	fmt.Print(Yellow("[?]"), fmt.Sprintf(message, args...))
-}
-
 func Failure(message string) {
 	fmt.Println(Red("[-]"), message)
 }
